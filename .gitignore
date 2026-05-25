@@ -1,0 +1,44 @@
+# Elixir
+/_build
+/deps
+/.cache/
+erl_crash.dump
+*.ez
+*.beam
+
+# Build artifacts
+*.crash
+*.tar.gz
+*.tar.xz
+
+# Mix
+.mix
+
+# Test artifacts
+/cover
+.eunit
+
+# IDE
+.elixir_ls
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+/tmp
+
+# Database
+postgres_data/
+*.db
