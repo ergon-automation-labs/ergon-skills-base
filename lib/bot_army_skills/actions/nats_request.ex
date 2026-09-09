@@ -28,7 +28,7 @@ defmodule BotArmySkills.Actions.NatsRequest do
          {:ok, request_payload} <- resolve_request_payload(config, payload),
          :ok <- validate_subject(subject, config),
          :ok <- validate_request_payload(subject, request_payload, config),
-         {:ok, conn} <- GenServer.call(BotArmyRuntime.NATS.Connection, :get_connection, 5_000),
+         {:ok, conn} <- GenServer.call(BotArmyLibraryRuntime.NATS.Connection, :get_connection, 5_000),
          {:ok, json} <- Jason.encode(build_message(subject, request_payload, config)),
          {:ok, reply} <- Gnat.request(conn, subject, json, timeout: timeout_ms(config)),
          {:ok, decoded} <- Jason.decode(reply.body) do
@@ -144,7 +144,7 @@ defmodule BotArmySkills.Actions.NatsRequest do
         payload =
           build_forward_payload(config, input_payload, bridge_subject, request_payload, response)
 
-        case BotArmyCore.NATS.publish(forward_subject, payload) do
+        case BotArmyLibraryCore.NATS.publish(forward_subject, payload) do
           {:ok, _} -> {:ok, forward_subject}
           {:error, reason} -> {:error, reason}
         end

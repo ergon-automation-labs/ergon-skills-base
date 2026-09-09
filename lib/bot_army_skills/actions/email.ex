@@ -33,7 +33,7 @@ defmodule BotArmySkills.Actions.Email do
       |> Enum.reject(fn {_k, v} -> is_nil(v) end)
       |> Map.new()
 
-    case BotArmyCore.NATS.publish("bot.army.email.send", message) do
+    case BotArmyLibraryCore.NATS.publish("bot.army.email.send", message) do
       {:ok, _} ->
         {:ok, %{queued: true, to: to, subject: subject}}
 

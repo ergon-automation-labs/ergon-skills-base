@@ -31,7 +31,7 @@ defmodule BotArmySkills.Actions.NatsPublish do
           payload
         end
 
-      case BotArmyCore.NATS.publish(subject, message) do
+      case BotArmyLibraryCore.NATS.publish(subject, message) do
         {:ok, _} ->
           {:ok, %{subject: subject, published: true}}
 

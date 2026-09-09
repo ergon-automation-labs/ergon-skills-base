@@ -8,7 +8,7 @@ defmodule BotArmySkills.HealthWatcher do
   use GenServer
   require Logger
 
-  alias BotArmyRuntime.NATS.Connection
+  alias BotArmyLibraryRuntime.NATS.Connection
 
   @reconnect_delay_ms 5_000
   @incident_cooldown_seconds 3_600

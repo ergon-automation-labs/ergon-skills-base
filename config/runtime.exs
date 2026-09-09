@@ -41,7 +41,7 @@ config :bot_army_skills, BotArmySkills.Repo,
   migrations_path: "priv/repo/migrations"
 
 # Database configuration for shared runtime repo used by the skills cache/store.
-config :bot_army_library_runtime, BotArmyRuntime.Ecto.Repo,
+config :bot_army_library_runtime, BotArmyLibraryRuntime.Ecto.Repo,
   database:
     System.get_env("BOT_ARMY_SKILLS_DB_NAME") || System.get_env("DATABASE_NAME") ||
       "bot_army_skills_dev",

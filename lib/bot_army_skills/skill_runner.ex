@@ -31,7 +31,7 @@ defmodule BotArmySkills.SkillRunner do
 
   defp execute_llm_driven_skill(skill, payload, ctx, opts) do
     tenant_id = skill.tenant_id
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     # Load soul if available in context
     soul_config = load_soul_config(ctx)
@@ -90,14 +90,14 @@ defmodule BotArmySkills.SkillRunner do
   defp load_soul_config(ctx) do
     case Map.get(ctx, :soul) do
       nil ->
-        # Try to load soul from BotArmy.Soul if available
+        # Try to load soul from the centralized Soul service (via the
+        # runtime facade; served by the memory service)
         bot_id = Map.get(ctx, :bot_id)
-        tenant_id = Map.get(ctx, :tenant_id, BotArmyRuntime.Tenant.default_tenant_id())
 
         try do
-          case BotArmy.Soul.get(bot_id, tenant_id: tenant_id) do
-            nil -> %{}
-            soul -> soul.config || %{}
+          case BotArmyLibraryRuntime.Soul.get(bot_id) do
+            {:ok, soul} -> soul.config || %{}
+            _ -> %{}
           end
         rescue
           _ -> %{}
@@ -128,7 +128,7 @@ defmodule BotArmySkills.SkillRunner do
       }
     }
 
-    with {:ok, conn} <- GenServer.call(BotArmyRuntime.NATS.Connection, :get_connection, 5_000),
+    with {:ok, conn} <- GenServer.call(BotArmyLibraryRuntime.NATS.Connection, :get_connection, 5_000),
          {:ok, json} <- Jason.encode(envelope) do
       request_llm_with_retry(conn, json, hint, String.length(prompt), prompt_id, 0)
     else
@@ -296,7 +296,7 @@ defmodule BotArmySkills.SkillRunner do
   end
 
   defp publish_skill_completed(skill, completion, action_results) do
-    BotArmyCore.NATS.publish("bot.army.#{skill.name}.event.skill_completed", %{
+    BotArmyLibraryCore.NATS.publish("bot.army.#{skill.name}.event.skill_completed", %{
       "skill" => Atom.to_string(skill.name),
       "slug" => skill.slug,
       "tenant_id" => skill.tenant_id,
@@ -312,7 +312,7 @@ defmodule BotArmySkills.SkillRunner do
   end
 
   defp publish_skill_failed(skill, reason) do
-    BotArmyCore.NATS.publish("bot.army.#{skill.name}.event.skill_failed", %{
+    BotArmyLibraryCore.NATS.publish("bot.army.#{skill.name}.event.skill_failed", %{
       "skill" => Atom.to_string(skill.name),
       "slug" => skill.slug,
       "tenant_id" => skill.tenant_id,

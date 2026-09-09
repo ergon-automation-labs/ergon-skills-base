@@ -11,20 +11,20 @@ defmodule BotArmySkills.SkillStore do
 
       SkillStore.get_active_skill(tenant_id, "summarize", repo: BotArmyGtd.Repo)
 
-  If no repo is provided, falls back to BotArmyRuntime.Ecto.Repo
+  If no repo is provided, falls back to BotArmyLibraryRuntime.Ecto.Repo
   (for development/convenience only).
   """
 
   alias BotArmySkills.{TenantAction, SkillDefinition}
 
-  @default_tenant_id BotArmyRuntime.Tenant.default_tenant_id()
+  @default_tenant_id BotArmyLibraryRuntime.Tenant.default_tenant_id()
 
   # --- Skills ---
 
   @doc "Get the active version of a skill by tenant and slug."
   @spec get_active_skill(String.t(), String.t(), keyword()) :: SkillDefinition.t() | nil
   def get_active_skill(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, name, slug, markdown_content, version, is_active
@@ -51,7 +51,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "Get all active skills for a tenant."
   @spec list_active_skills(String.t(), keyword()) :: [SkillDefinition.t()]
   def list_active_skills(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, name, slug, markdown_content, version, is_active
@@ -74,7 +74,7 @@ defmodule BotArmySkills.SkillStore do
   @spec get_skill_version(String.t(), String.t(), integer(), keyword()) ::
           SkillDefinition.t() | nil
   def get_skill_version(tenant_id, slug, version, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, name, slug, markdown_content, version, is_active
@@ -105,7 +105,7 @@ defmodule BotArmySkills.SkillStore do
   @spec create_skill(String.t(), map(), keyword()) ::
           {:ok, SkillDefinition.t()} | {:error, term()}
   def create_skill(tenant_id, attrs, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     slug = Map.fetch!(attrs, :slug)
     name = Map.get(attrs, :name, slug)
@@ -143,7 +143,7 @@ defmodule BotArmySkills.SkillStore do
   @spec activate_version(String.t(), String.t(), integer(), keyword()) ::
           {:ok, SkillDefinition.t()} | {:error, term()}
   def activate_version(tenant_id, slug, version, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     # Deactivate all versions
     deactivate_query = """
@@ -177,7 +177,7 @@ defmodule BotArmySkills.SkillStore do
   @spec deactivate_current(String.t(), String.t(), keyword()) ::
           {:ok, SkillDefinition.t() | nil} | {:error, term()}
   def deactivate_current(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     # Get current active version
     case get_active_skill(tenant_id, slug, opts) do
@@ -221,7 +221,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "List version history for a skill."
   @spec list_versions(String.t(), String.t(), keyword()) :: [SkillDefinition.t()]
   def list_versions(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, name, slug, markdown_content, version, is_active
@@ -244,7 +244,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "Get an action by tenant and slug."
   @spec get_action(String.t(), String.t(), keyword()) :: TenantAction.t() | nil
   def get_action(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, slug, type, config_json, is_active
@@ -267,7 +267,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "List all active actions for a tenant."
   @spec list_active_actions(String.t(), keyword()) :: [TenantAction.t()]
   def list_active_actions(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     SELECT id, tenant_id, slug, type, config_json, is_active
@@ -289,7 +289,7 @@ defmodule BotArmySkills.SkillStore do
   @spec upsert_action(String.t(), map(), keyword()) ::
           {:ok, TenantAction.t()} | {:error, term()}
   def upsert_action(tenant_id, attrs, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     slug = Map.fetch!(attrs, :slug)
     type = Map.fetch!(attrs, :type)
@@ -324,7 +324,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "Seed canonical skills from the default tenant for a new tenant."
   @spec seed_canonical_skills(String.t(), keyword()) :: [SkillDefinition.t()]
   def seed_canonical_skills(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     INSERT INTO skills (tenant_id, name, slug, markdown_content, version, is_active, inserted_at, updated_at)
@@ -341,7 +341,7 @@ defmodule BotArmySkills.SkillStore do
   @doc "Seed canonical actions from the default tenant for a new tenant."
   @spec seed_canonical_actions(String.t(), keyword()) :: [TenantAction.t()]
   def seed_canonical_actions(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     query = """
     INSERT INTO tenant_actions (tenant_id, slug, type, config_json, is_active, inserted_at, updated_at)
@@ -406,7 +406,7 @@ defmodule BotArmySkills.SkillStore do
   end
 
   defp publish_cache_invalidation(tenant_id, slug) do
-    BotArmyCore.NATS.publish("bot.army.skills.cache.invalidate", %{
+    BotArmyLibraryCore.NATS.publish("bot.army.skills.cache.invalidate", %{
       "tenant_id" => tenant_id,
       "slug" => slug
     })

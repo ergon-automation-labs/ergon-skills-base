@@ -5,7 +5,7 @@ config :bot_army_skills, BotArmySkills.Repo,
   pool_size: 10,
   migrations_path: "priv/repo/migrations"
 
-config :bot_army_library_runtime, BotArmyRuntime.Ecto.Repo,
+config :bot_army_library_runtime, BotArmyLibraryRuntime.Ecto.Repo,
   database: "bot_army_skills_dev",
   pool_size: 10,
   migrations_path: "priv/repo/migrations"

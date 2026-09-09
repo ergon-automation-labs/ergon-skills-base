@@ -1,7 +1,7 @@
 import Config
 
 config :bot_army_skills,
-  ecto_repos: [BotArmySkills.Repo, BotArmyRuntime.Ecto.Repo],
+  ecto_repos: [BotArmySkills.Repo, BotArmyLibraryRuntime.Ecto.Repo],
   handlers: [
     BotArmySkills.Handlers.ContentHandler,
     BotArmySkills.Handlers.CatalogHandler,

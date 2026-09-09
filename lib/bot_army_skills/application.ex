@@ -6,7 +6,7 @@ defmodule BotArmySkills.Application do
   def start(_type, _args) do
     children = [
       BotArmySkills.Repo,
-      BotArmyRuntime.Ecto.Repo,
+      BotArmyLibraryRuntime.Ecto.Repo,
       BotArmySkills.SkillCache,
       BotArmySkills.PulsePublisher,
       BotArmySkills.NATS.Consumer,

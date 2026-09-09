@@ -4,9 +4,9 @@ defmodule BotArmySkills.PulsePublisher do
   use GenServer
   require Logger
 
-  alias BotArmyRuntime.NATS.Publisher
-  alias BotArmyRuntime.Tenant
-  alias BotArmyRuntime.SynapseHealth
+  alias BotArmyLibraryRuntime.NATS.Publisher
+  alias BotArmyLibraryRuntime.Tenant
+  alias BotArmyLibraryRuntime.SynapseHealth
 
   @health_interval_ms 30 * 1000
   @pulse_interval_ms 30 * 60 * 1000
@@ -50,7 +50,7 @@ defmodule BotArmySkills.PulsePublisher do
   end
 
   defp publish_system_health(%{started_at: started_at}) do
-    tenant_id = System.get_env("BOT_ARMY_TENANT_ID") || Tenant.default_tenant_id()
+    tenant_id = System.get_env("BOT_ARMY_TENANT_ID") || BotArmyLibraryRuntime.Tenant.default_tenant_id()
 
     uptime_seconds =
       DateTime.diff(DateTime.utc_now() |> DateTime.truncate(:second), started_at, :second)

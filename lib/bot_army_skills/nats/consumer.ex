@@ -22,9 +22,9 @@ defmodule BotArmySkills.NATS.Consumer do
   use GenServer
   require Logger
 
-  alias BotArmyRuntime.NATS.Connection
-  alias BotArmyRuntime.Registry
-  alias BotArmyCore.NATS.Decoder
+  alias BotArmyLibraryRuntime.NATS.Connection
+  alias BotArmyLibraryRuntime.Registry
+  alias BotArmyLibraryCore.NATS.Decoder
 
   @reconnect_delay_ms 5_000
   @version Mix.Project.config()[:version]
@@ -152,7 +152,7 @@ defmodule BotArmySkills.NATS.Consumer do
 
   @impl true
   def handle_info({:msg, msg}, state) do
-    BotArmyRuntime.Tracing.with_consumer_span(msg.topic, Map.get(msg, :headers, []), fn ->
+    BotArmyLibraryRuntime.Tracing.with_consumer_span(msg.topic, Map.get(msg, :headers, []), fn ->
       Logger.debug("[SkillsConsumer] Received message on subject: #{msg.topic}")
 
       cond do
@@ -275,7 +275,7 @@ defmodule BotArmySkills.NATS.Consumer do
       Logger.warning("[SkillsConsumer] Could not parse skill slug from subject: #{subject}")
       :ok
     else
-      tenant_id = Map.get(envelope, "tenant_id", BotArmyRuntime.Tenant.default_tenant_id())
+      tenant_id = Map.get(envelope, "tenant_id", BotArmyLibraryRuntime.Tenant.default_tenant_id())
 
       Logger.debug(
         "[SkillsConsumer] Executing skill: #{slug} for tenant #{String.slice(tenant_id, 0, 8)}..."
@@ -361,7 +361,7 @@ defmodule BotArmySkills.NATS.Consumer do
   end
 
   defp publish_skill_executed(skill, result, envelope) do
-    BotArmyCore.NATS.publish("bot.army.command.executed", %{
+    BotArmyLibraryCore.NATS.publish("bot.army.command.executed", %{
       "skill" => Atom.to_string(skill.name),
       "slug" => skill.slug,
       "tenant_id" => skill.tenant_id,

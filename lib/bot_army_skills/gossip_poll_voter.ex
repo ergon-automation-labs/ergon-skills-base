@@ -3,7 +3,7 @@ defmodule BotArmySkills.GossipPollVoter do
 
   require Logger
 
-  alias BotArmyRuntime.NATS.Publisher
+  alias BotArmyLibraryRuntime.NATS.Publisher
   alias Tenant
 
   @table :skills_gossip_poll_state
@@ -80,7 +80,7 @@ defmodule BotArmySkills.GossipPollVoter do
       "schema_version" => "1.0",
       "timestamp" => DateTime.utc_now() |> DateTime.to_iso8601(),
       "source" => "bot_army_skills",
-      "tenant_id" => Tenant.default_tenant_id(),
+      "tenant_id" => BotArmyLibraryRuntime.Tenant.default_tenant_id(),
       "conversation_id" => poll_id,
       "payload" => %{
         "poll_id" => poll_id,
@@ -119,7 +119,7 @@ defmodule BotArmySkills.GossipPollVoter do
   end
 
   defp choose_priority_vote(options, context_snapshot) do
-    BotArmyRuntime.GossipPollAffinity.choose_priority_vote(
+    BotArmyLibraryRuntime.GossipPollAffinity.choose_priority_vote(
       options,
       context_snapshot,
       :skills,

@@ -33,7 +33,7 @@ defmodule BotArmySkills.SkillCache do
   @doc "Get an active skill from cache, loading from DB on miss."
   @spec get_skill(String.t(), String.t(), keyword()) :: SkillDefinition.t() | nil
   def get_skill(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     case :ets.lookup(@table, {tenant_id, :skill, slug}) do
       [{_key, @missing_skill, _expires_at}] ->
@@ -50,7 +50,7 @@ defmodule BotArmySkills.SkillCache do
   @doc "Get all active skills for a tenant from cache."
   @spec list_skills(String.t(), keyword()) :: [SkillDefinition.t()]
   def list_skills(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     case :ets.lookup(@table, {:tenant_loaded, tenant_id}) do
       [{_key, true, _expires_at}] ->
@@ -65,7 +65,7 @@ defmodule BotArmySkills.SkillCache do
   @doc "Get an action from cache, loading from DB on miss."
   @spec get_action(String.t(), String.t(), keyword()) :: BotArmySkills.TenantAction.t() | nil
   def get_action(tenant_id, slug, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     case :ets.lookup(@table, {tenant_id, :action, slug}) do
       [{_key, action, _expires_at}] ->
@@ -85,7 +85,7 @@ defmodule BotArmySkills.SkillCache do
   @doc "Force refresh all cached data for a tenant."
   @spec refresh(String.t(), keyword()) :: :ok
   def refresh(tenant_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Keyword.get(opts, :repo, BotArmyLibraryRuntime.Ecto.Repo)
     GenServer.cast(__MODULE__, {:refresh, tenant_id, repo})
   end
 
@@ -96,7 +96,7 @@ defmodule BotArmySkills.SkillCache do
     :ets.new(@table, [:set, :named_table, :public, {:read_concurrency, true}])
 
     try do
-      BotArmyCore.NATS.subscribe("bot.army.skills.cache.invalidate")
+      BotArmyLibraryCore.NATS.subscribe("bot.army.skills.cache.invalidate")
     rescue
       _ -> :ok
     end
@@ -195,7 +195,7 @@ defmodule BotArmySkills.SkillCache do
   @impl true
   def handle_info(:poll, state) do
     Enum.each(state.tenants_loaded, fn tenant_id ->
-      repo = Map.get(state.tenant_repos, tenant_id, BotArmyRuntime.Ecto.Repo)
+      repo = Map.get(state.tenant_repos, tenant_id, BotArmyLibraryRuntime.Ecto.Repo)
       skills = SkillStore.list_active_skills(tenant_id, repo: repo)
       expires_at = System.monotonic_time(:millisecond) + @poll_interval
 

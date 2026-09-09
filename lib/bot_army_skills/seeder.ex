@@ -17,7 +17,7 @@ defmodule BotArmySkills.Seeder do
 
   alias BotArmySkills.SkillStore
 
-  @default_tenant_id BotArmyRuntime.Tenant.default_tenant_id()
+  @default_tenant_id BotArmyLibraryRuntime.Tenant.default_tenant_id()
 
   @doc "Seed canonical skills for the default tenant from priv/canonical_skills/"
   @spec seed_default_tenant!(keyword()) :: [:ok | {:error, term()}]

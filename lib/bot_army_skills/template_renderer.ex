@@ -32,7 +32,7 @@ defmodule BotArmySkills.TemplateRenderer do
 
   # {{action:slug}} -> resolved from tenant_actions
   defp render_actions(template, %{tenant_id: tenant_id} = vars) do
-    repo = Map.get(vars, :repo, BotArmyRuntime.Ecto.Repo)
+    repo = Map.get(vars, :repo, BotArmyLibraryRuntime.Ecto.Repo)
 
     Regex.replace(~r/\{\{\s*action:([a-z0-9_]+)\s*\}\}/, template, fn _match, slug ->
       try do

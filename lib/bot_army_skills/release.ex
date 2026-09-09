@@ -2,7 +2,7 @@ defmodule BotArmySkills.Release do
   @moduledoc """
   Release tasks for the skills bot.
 
-  Migrations are run via the shared BotArmyRuntime.Ecto.MigrationRunner:
+  Migrations are run via the shared BotArmyLibraryRuntime.Ecto.MigrationRunner:
 
       /path/to/skills_bot/bin/skills_bot eval 'BotArmySkills.Release.migrate()'
       /path/to/skills_bot/bin/skills_bot eval 'BotArmySkills.Release.migrate_and_seed()'
@@ -10,7 +10,7 @@ defmodule BotArmySkills.Release do
   Called from Salt during bot deployment, before the bot starts.
   """
 
-  alias BotArmyRuntime.Ecto.MigrationRunner
+  alias BotArmyLibraryRuntime.Ecto.MigrationRunner
 
   @app :bot_army_skills
 
@@ -34,7 +34,7 @@ defmodule BotArmySkills.Release do
 
     # Start both repos that will be needed during migrations and seeding
     {:ok, _} = BotArmySkills.Repo.start_link(pool_size: 2)
-    {:ok, _} = BotArmyRuntime.Ecto.Repo.start_link(pool_size: 2)
+    {:ok, _} = BotArmyLibraryRuntime.Ecto.Repo.start_link(pool_size: 2)
 
     # Run migrations directly (repos are already started)
     Ecto.Migrator.run(BotArmySkills.Repo, :up, all: true, migrations_path: migrations_path())
@@ -104,6 +104,6 @@ defmodule BotArmySkills.Release do
     ]
 
     Application.put_env(:bot_army_skills, BotArmySkills.Repo, db_config)
-    Application.put_env(:bot_army_library_runtime, BotArmyRuntime.Ecto.Repo, db_config)
+    Application.put_env(:bot_army_library_runtime, BotArmyLibraryRuntime.Ecto.Repo, db_config)
   end
 end
