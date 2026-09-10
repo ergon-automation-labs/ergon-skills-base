@@ -114,6 +114,13 @@ mix ecto.migrate
 mix skills.seed
 ```
 
+> **Note on shared tables:** tables owned by `bot_army_library_runtime`
+> (`heartbeats`, `souls`, `memory_entries`, `intent_outcomes`,
+> `intent_threshold_adjustments`) are applied automatically by
+> `BotArmyLibraryRuntime.Ecto.MigrationRunner` to this bot's database before
+> its own migrations. **Do not copy those migrations into `priv/repo/migrations/`**
+> — see the "Shared Schema Contract" section of the library's README.
+
 ## Running Tests
 
 ```bash
