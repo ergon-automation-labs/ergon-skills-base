@@ -1,7 +1,6 @@
 SCRIPTS_DIRECTORY ?= $(abspath $(CURDIR)/../scripts)
-MIX ?= /Users/abby/.local/share/mise/shims/mix
 
-.PHONY: help setup-hooks push-and-publish publish-release release test credo check format clean deps
+.PHONY: help push-and-publish publish-release release test check format clean deps _compile-impl
 
 help:
 	@echo "Bot Army Skills"
@@ -18,18 +17,20 @@ help:
 	@echo "  make publish-release - Build and publish release to GitHub"
 	@echo "  make push-and-publish - Push then publish release"
 
-setup-hooks:
-	@git config core.hooksPath git-hooks
-	@echo "✓ Git hooks installed (core.hooksPath = git-hooks)"
-
 deps:
 	$(MIX) deps.get
 
 test:
 	$(MIX) test
 
-credo:
-	$(MIX) credo --strict
+# Called by the shared `compile` target (bot_army_infra/make/common.mk), which
+# `make push` depends on. Without it `make push` dies with
+# "No rule to make target '_compile-impl'".
+_compile-impl:
+	@LOG_FILE="/tmp/compile-full-$$(date +%s).log"; \
+	echo "Compiling and logging to $$LOG_FILE..."; \
+	$(MIX) compile 2>&1 | tee "$$LOG_FILE"; \
+	echo "✓ Compilation log: $$LOG_FILE"
 
 check: test credo
 
@@ -71,3 +72,18 @@ publish-release: release
 
 push-and-publish:
 	@git push && $(MAKE) publish-release
+
+
+# ── Shared targets (push, git-push, credo, setup-hooks, compile, pre-push-cleanup,
+# bump-version, sync-hook). Defined once in bot_army_infra so they cannot drift
+# per repo.
+# * ergon-skills-base had NO push / git-jush / bump-version target: the standard fleet
+# driver (bump → push → publish → deploy) could not drive it at all.
+#
+# No version bump: build tooling only; the release artifact is unchanged.
+BOT_ARMY_COMMON_MK := $(abspath $(CURDIR)/../bot_army_infra/make/common.mk)
+ifeq ($(wildcard $(BOT_ARMY_COMMON_MK)),)
+$(warning bot_army_infra not found at $(BOT_ARMY_COMMON_MK) - shared targets unavailable)
+else
+include $(BOT_ARMY_COMMON_MK)
+endif
