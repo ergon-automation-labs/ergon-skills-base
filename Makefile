@@ -70,6 +70,7 @@ publish-release: release
 	echo ""; \
 	echo "✓ Release published successfully"
 
+	@$(MAKE) publish-deploy-event TARGET=air
 push-and-publish:
 	@git push && $(MAKE) publish-release
 
